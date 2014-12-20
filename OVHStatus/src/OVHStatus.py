@@ -6,7 +6,7 @@
 
 import os,feedparser,urlparse,shortenurl,parsehtml,twatter
 from ConfigParser import SafeConfigParser, ConfigParser
-from setuptools.compat import iteritems
+
 
 print 'Reading config & data files'
 configparser = SafeConfigParser()
