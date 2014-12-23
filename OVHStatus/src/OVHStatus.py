@@ -1,10 +1,20 @@
 """
 --TODO--
 1. Add a check that checks for t.co address lenght once per day
-2. Parse even more the title
+2. Support Pushbullet?
+3. Support Pushover?
 """
 
-import os,feedparser,urlparse,shortenurl,parsehtml,twatter
+VERSION_NUMBER = '1.1.0'
+
+"""
+SEMANTIC VERSIONING:
+1. MAJOR version when you make incompatible API changes,
+2. MINOR version when you add functionality in a backwards-compatible manner, and
+3. PATCH version when you make backwards-compatible bug fixes.
+"""
+
+import os,feedparser,urlparse,shortenurl,parsehtml,twatter,test,re
 from ConfigParser import SafeConfigParser, ConfigParser
 
 
@@ -28,7 +38,7 @@ old_id = data.read()
 
 #Lets tell them who we are, incase they are wondering who is accessing their RSS feed every minute
 print 'Fetching RSS feed'
-feedparser.USER_AGENT = "OVHStatusTwatBot/1.0.0 +https://twitter.com/ovh_status"
+feedparser.USER_AGENT = "OVHStatusTwatBot/" + VERSION_NUMBER + " +https://twitter.com/ovh_status"
 d = feedparser.parse('http://status.ovh.com/rss.php')
 
 
@@ -76,18 +86,25 @@ Also doing some parsing, and decreasing the info into acceptable tweet (140 char
 for post in phonebook:
     if post > old_id:
        
-        print phonebook.get(post)
         entry = phonebook.get(post)
         orgurl = d.entries[entry].link
         
         #Shorten URL
-        tweeturl = shortenurl.short(orgurl, URL_SHORT_API_KEY, URL_SHORT_IP)
+        tweeturl = shortenurl.short(orgurl, URL_SHORT_API_KEY, URL_SHORT_IP, VERSION_NUMBER)
         title = d.entries[entry].title
         description = d.entries[entry].description
-        parsedDescription = parsehtml.strip(description)
+        description = parsehtml.strip(description)
+        
+        
+        #In this section we remove unnecessary FS#NUMBER thing from tweet
+        #\xe2\x80\x94 = Long dash
+        delimiters = "::", '\xe2\x80\x94 '
+        regexPattern = '|'.join(map(re.escape, delimiters))
+        parsedtitle = re.split(regexPattern, title.encode('utf-8'))
+        title = parsedtitle[0] + " | " + parsedtitle[2]       
         
         #Joining title and parsed description together
-        tweetText = title + ": " + parsedDescription
+        tweetText = title + ": " + description
         
         #Lenght of tweeturl
         ltweeturl = len(tweeturl)
