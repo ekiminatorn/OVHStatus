@@ -1,12 +1,14 @@
-import requests,json
-import urllib
+import requests,json,urllib
 
-def short(url, api, ip):
-    
+"""
+Shortening URL to own custom URL function
+"""
+def short(url, api, ip, version):
+
     #Parameters for the URL
     payload = {'signature': api, 'action': 'shorturl', 'url': url, 'format': 'json'}
     
-    user_agent = {'User-agent': 'OVHStatusTwatBot/1.0.0 +http://twitter.com/ovh_status'}
+    user_agent = {'User-agent': 'OVHStatusTwatBot/' + version + ' +http://twitter.com/ovh_status'}
     response = requests.get(ip, params=payload, headers = user_agent)  
     
     #Getting short url from JSON response
