@@ -17,7 +17,7 @@ SEMANTIC VERSIONING:
 import os,feedparser,urlparse,shortenurl,parsehtml,twatter,test,re
 from ConfigParser import SafeConfigParser, ConfigParser
 
-
+print '----'
 print 'Reading config & data files'
 configparser = SafeConfigParser()
 configparser.read('config.cfg')
