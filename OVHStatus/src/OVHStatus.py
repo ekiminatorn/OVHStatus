@@ -5,7 +5,7 @@
 3. Support Pushover?
 """
 
-VERSION_NUMBER = '1.1.0'
+VERSION_NUMBER = '1.1.1'
 
 """
 SEMANTIC VERSIONING:
