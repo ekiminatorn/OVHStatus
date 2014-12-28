@@ -5,7 +5,7 @@
 3. Support Pushover?
 """
 
-VERSION_NUMBER = '1.1.0'
+VERSION_NUMBER = '1.1.1'
 
 """
 SEMANTIC VERSIONING:
@@ -17,7 +17,7 @@ SEMANTIC VERSIONING:
 import os,feedparser,urlparse,shortenurl,parsehtml,twatter,test,re
 from ConfigParser import SafeConfigParser, ConfigParser
 
-
+print '-------------------------------------'
 print 'Reading config & data files'
 configparser = SafeConfigParser()
 configparser.read('config.cfg')
@@ -95,13 +95,13 @@ for post in phonebook:
         description = d.entries[entry].description
         description = parsehtml.strip(description)
         
-        
-        #In this section we remove unnecessary FS#NUMBER thing from tweet
-        #\xe2\x80\x94 = Long dash
-        delimiters = "::", '\xe2\x80\x94 '
-        regexPattern = '|'.join(map(re.escape, delimiters))
-        parsedtitle = re.split(regexPattern, title.encode('utf-8'))
-        title = parsedtitle[0] + " | " + parsedtitle[2]       
+        if "FS#" in title:
+            #In this section we remove unnecessary FS#NUMBER thing from tweet
+            #\xe2\x80\x94 = Long dash
+            delimiters = "::", '\xe2\x80\x94 '
+            regexPattern = '|'.join(map(re.escape, delimiters))
+            parsedtitle = re.split(regexPattern, title.encode('utf-8'))
+            title = parsedtitle[0] + " | " + parsedtitle[2]       
         
         #Joining title and parsed description together
         tweetText = title + ": " + description
@@ -111,14 +111,14 @@ for post in phonebook:
         tweetLenght = 140
 
         #For twitters t.co link bullshit and one for space, two for dots
-        tweetLenght -= 25
+        tweetLenght -= 30
 
 
         #If tweet is too long, make it shorter
         if len(tweetText) > tweetLenght:
             tweetText = (tweetText[:tweetLenght] + '..')
             
-        tweet = tweetText + ' ' + tweeturl
+        tweet = tweetText + ' ' + tweeturl + ' #OVH'
 
         
 
