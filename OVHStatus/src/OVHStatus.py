@@ -14,7 +14,7 @@ SEMANTIC VERSIONING:
 3. PATCH version when you make backwards-compatible bug fixes.
 """
 
-import os,feedparser,urlparse,shortenurl,parsehtml,twatter,test,re,time,pushover
+import os,feedparser,urlparse,shortenurl,parsehtml,twatter,re,time,pushover
 from ConfigParser import SafeConfigParser, ConfigParser
 
 
