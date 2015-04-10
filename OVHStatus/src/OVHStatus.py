@@ -14,7 +14,7 @@ SEMANTIC VERSIONING:
 3. PATCH version when you make backwards-compatible bug fixes.
 """
 
-import os,feedparser,urlparse,shortenurl,parsehtml,twatter,re,time
+import os,feedparser,urlparse,shortenurl,parsehtml,twatter,re,time,tweepy,push
 from ConfigParser import SafeConfigParser, ConfigParser
 
 
@@ -131,9 +131,8 @@ for post in phonebook:
         try:
             twatter.tweet(tweet, TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_TOKEN_SECRET)
         except tweepy.TweepError as e:
-            
             error_msg = '#####ERROR#####\n' + time.strftime("%c") + '\n' + e.message[0]['message'] + '\nTweetText: ' + tweet + '\n###############\n\n'
-            pushover.send(PUSHOVER_APP_API_TOKEN, PUSHOVER_USER_TOKEN, error_msg, 'OVHStatus')
+            push.send(PUSHOVER_APP_API_TOKEN, PUSHOVER_USER_TOKEN, error_msg, 'OVHStatus')
             errorwrite = open('error.log', 'w')
             errorwrite.write(error_msg)
             errorwrite.close()
