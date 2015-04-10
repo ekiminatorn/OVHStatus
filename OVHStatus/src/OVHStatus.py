@@ -5,7 +5,7 @@
 3. Support Pushover?
 """
 
-VERSION_NUMBER = '1.1.1'
+VERSION_NUMBER = '1.2.1'
 
 """
 SEMANTIC VERSIONING:
@@ -14,8 +14,9 @@ SEMANTIC VERSIONING:
 3. PATCH version when you make backwards-compatible bug fixes.
 """
 
-import os,feedparser,urlparse,shortenurl,parsehtml,twatter,test,re
+import os,feedparser,urlparse,shortenurl,parsehtml,twatter,test,re,time
 from ConfigParser import SafeConfigParser, ConfigParser
+
 
 print '-------------------------------------'
 print 'Reading config & data files'
@@ -124,7 +125,17 @@ for post in phonebook:
 
         print 'Tweeting..'
         
-        twatter.tweet(tweet, TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_TOKEN_SECRET)
+        try:
+            twatter.tweet(tweet, TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_TOKEN_SECRET)
+        except tweepy.TweepError as e:
+            
+            error_msg = '#####ERROR#####\n' + time.strftime("%c") + '\n' + e.message[0]['message'] + '\nTweetText: ' + tweet + '\n###############\n\n'
+            errorwrite = open('error.log', 'w')
+            errorwrite.write(error_msg)
+            errorwrite.close()
+            print 'Error occurred. Check error.log'
+            pass
+        
         
         print 'Tweet sent!'
         
@@ -145,22 +156,3 @@ datawrite.close()
 
 print 'Everything that I can do has been done. Terminating..'
 exit(0)
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
