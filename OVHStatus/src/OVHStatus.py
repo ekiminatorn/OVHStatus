@@ -14,7 +14,7 @@ SEMANTIC VERSIONING:
 3. PATCH version when you make backwards-compatible bug fixes.
 """
 
-import os,feedparser,urlparse,shortenurl,parsehtml,twatter,test,re,time
+import os,feedparser,urlparse,shortenurl,parsehtml,twatter,test,re,time,pushover
 from ConfigParser import SafeConfigParser, ConfigParser
 
 
@@ -32,10 +32,13 @@ TWITTER_CONSUMER_SECRET = configparser.get('TWITTER_CREDENTIALS', 'consumer_secr
 TWITTER_ACCESS_TOKEN = configparser.get('TWITTER_CREDENTIALS', 'access_token')
 TWITTER_ACCESS_TOKEN_SECRET = configparser.get('TWITTER_CREDENTIALS', 'access_token_secret')
 
+#Pushover credentials
+PUSHOVER_APP_API_TOKEN = configparser.get('PUSHOVER_CREDENTIALS', 'app_api_token')
+PUSHOVER_USER_TOKEN = configparser.get('PUSHOVER_CREDENTIALS', 'user_token')
+
 #In 'data' file we store the latest post ID that we tweeted
 data = open('data', 'r')
 old_id = data.read()
-
 
 #Lets tell them who we are, incase they are wondering who is accessing their RSS feed every minute
 print 'Fetching RSS feed'
@@ -130,6 +133,7 @@ for post in phonebook:
         except tweepy.TweepError as e:
             
             error_msg = '#####ERROR#####\n' + time.strftime("%c") + '\n' + e.message[0]['message'] + '\nTweetText: ' + tweet + '\n###############\n\n'
+            pushover.send(PUSHOVER_APP_API_TOKEN, PUSHOVER_USER_TOKEN, error_msg, 'OVHStatus')
             errorwrite = open('error.log', 'w')
             errorwrite.write(error_msg)
             errorwrite.close()
