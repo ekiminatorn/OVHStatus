@@ -1,0 +1,6 @@
+{
+  "name": "OVH Status",
+  "tagline": "Unofficial OVH Status updates",
+  "body": "### Unofficial OVH Status Twitter bot.\r\nAll incident information displayed at [https://twitter.com/ovh_status](https://twitter.com/ovh_status) is fetched from [http://status.ovh.com/](http://status.ovh.com/), the english version of [http://travaux.ovh.com/](http://travaux.ovh.com/).\r\n\r\nIf you want real-time incident updates, [http://travaux.ovh.com/](http://travaux.ovh.com/) is much better, as [http://status.ovh.com/](http://status.ovh.com/) version is slower due to OVH Staff having to translate the incident reports from [http://travaux.ovh.com/](http://travaux.ovh.com/)\r\n\r\n",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}
