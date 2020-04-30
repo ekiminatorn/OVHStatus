@@ -1,43 +1,25 @@
 # coding=utf-8
-"""
---TODO--
-1. Add a check that checks for t.co address lenght once per day
-2. Support Pushbullet?
-3. Support Pushover?
-"""
 
-VERSION_NUMBER = '1.2.2'
+VERSION_NUMBER = '1.3.0'
 
-"""
-SEMANTIC VERSIONING:
-1. MAJOR version when you make incompatible API changes,
-2. MINOR version when you add functionality in a backwards-compatible manner, and
-3. PATCH version when you make backwards-compatible bug fixes.
-"""
-
-import os,feedparser,urlparse,shortenurl,parsehtml,twatter,re,time,tweepy,push,sys
+import os,feedparser,urlparse,parsehtml,twatter,re,time,tweepy,sys
 from ConfigParser import SafeConfigParser, ConfigParser
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
+time.sleep(45)
+
 print '-------------------------------------'
 print 'Reading config & data files'
 configparser = SafeConfigParser()
 configparser.read('config.cfg')
-#URL Shortener service API key
-URL_SHORT_API_KEY = configparser.get('URL_SHORTENER_SERVICE', 'api_key')
-URL_SHORT_IP = configparser.get('URL_SHORTENER_SERVICE', 'ip')
 
 #Twitter credentials
 TWITTER_CONSUMER_KEY = configparser.get('TWITTER_CREDENTIALS', 'consumer_key')
 TWITTER_CONSUMER_SECRET = configparser.get('TWITTER_CREDENTIALS', 'consumer_secret')
 TWITTER_ACCESS_TOKEN = configparser.get('TWITTER_CREDENTIALS', 'access_token')
 TWITTER_ACCESS_TOKEN_SECRET = configparser.get('TWITTER_CREDENTIALS', 'access_token_secret')
-
-#Pushover credentials
-PUSHOVER_APP_API_TOKEN = configparser.get('PUSHOVER_CREDENTIALS', 'app_api_token')
-PUSHOVER_USER_TOKEN = configparser.get('PUSHOVER_CREDENTIALS', 'user_token')
 
 #In 'data' file we store the latest post ID that we tweeted
 data = open('data', 'r')
@@ -48,6 +30,16 @@ print 'Fetching RSS feed'
 feedparser.USER_AGENT = "OVHStatusTwatBot/" + VERSION_NUMBER + " +https://twitter.com/ovh_status"
 d = feedparser.parse('http://travaux.ovh.com/rss.php')
 
+"""
+17.7.2017: For some reason OVH status pages sometimes spits polish version, fucking up everything.
+The following logic checks that the rss feed we got is the right one: OVH Travaux from the feed title
+"""
+
+print d['feed']['title']
+
+if d['feed']['title'] != "OVH Travaux":
+    print "not OVH Travaux. Exiting!"
+    exit(0)
 
 """
 In this for loop, we go through all entries, parsing their guid (url) to get the unique ID of entry.
@@ -102,6 +94,7 @@ for post in phonebook:
         description = d.entries[entry].description
         description = parsehtml.strip(description)
 	description.encode('utf-8')
+
         
         if "FS#" in title:
             #In this section we remove unnecessary FS#NUMBER thing from tweet
@@ -132,21 +125,35 @@ for post in phonebook:
         
         #Joining title and parsed description together
         tweetText = title + ": " + description
-        
+
+        tweetText.encode('utf-8')
         #Lenght of tweeturl
         ltweeturl = len(tweeturl)
-        tweetLenght = 140
+        tweetLenght = 280
+	#280
 
-        #For twitters t.co link bullshit and one for space, two for dots
-        tweetLenght -= 31
-
+        #For twitters t.co link bullshit and one for space, two for dots and #OVH
+        tweetLenght -= 35
 
         #If tweet is too long, make it shorter
-        if len(tweetText) > tweetLenght:
+	if len(tweetText) > tweetLenght:
+	     
             tweetText = (tweetText[:tweetLenght] + '..')
             
-        tweet = tweetText + ' ' + tweeturl + ' #OVH'
+        tweet = tweetText + ' ' + tweeturl + ' #ovh'
+	
+	#Checking that tweet IS less than allowed once more, and if not. it will cut it as much as it needs to be shortened.
+	if len(tweetText) > tweetLenght:
+	   print len(tweetText) - tweetLenght
+	   newlength = len(tweetText) - tweetLenght
+	   newlength = tweetLenght - newlength
+	   tweetText = tweetText[:tweetLenght]
+	   print "Lets see"
+	   print len(tweetText)    
+		
 
+	tweet = tweetText + ' ' + tweeturl + ' #ovh'
+	print len(tweet)
         
 
         print 'Tweeting..'
@@ -155,7 +162,7 @@ for post in phonebook:
             twatter.tweet(tweet, TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_TOKEN_SECRET)
         except tweepy.TweepError as e:
             error_msg = '#####ERROR#####\n' + time.strftime("%c") + '\n' + e.message[0]['message'] + '\nTweetText: ' + tweet + '\n###############\n\n'
-            push.send(PUSHOVER_APP_API_TOKEN, PUSHOVER_USER_TOKEN, error_msg, 'OVHStatus')
+            #push.send(PUSHOVER_APP_API_TOKEN, PUSHOVER_USER_TOKEN, error_msg, 'OVHStatus')
             errorwrite = open('error.log', 'w')
             errorwrite.write(error_msg)
             errorwrite.close()
