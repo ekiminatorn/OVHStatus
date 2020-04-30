@@ -12,9 +12,4 @@ def tweet(tweet, consumer_key, consumer_secret, access_token, access_token_secre
     print(api.me().name)
     
     api.update_status(status=tweet)
-    
-    
-def urllength():
-    """
-    TODO
-    """
+
