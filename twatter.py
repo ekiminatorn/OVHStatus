@@ -8,8 +8,8 @@ def tweet(tweet, consumer_key, consumer_secret, access_token, access_token_secre
     
     api = tweepy.API(auth)
     
-    print 'If auth was successful, we should see username now:'
-    print(api.me().name)
+    print('If auth was successful, we should see username now:')
+    print((api.me().name))
     
     api.update_status(status=tweet)
 
